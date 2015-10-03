@@ -1,0 +1,125 @@
+.dropzone {
+  &.dropzone-blue {
+    border-color: #006dcc;
+
+    .dz-preview {
+      border: 1px dashed #122b40;
+    }
+  }
+
+  & {
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.2) url("dropzone-back.png") no-repeat center;
+    min-height: 140px;
+    border: 2px dashed rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 6px;
+
+    &.dz-started {
+      background-image: none;
+    }
+
+    &.dz-drag-hover {
+      border-style: solid;
+    }
+
+    &.dz-clickable {
+      cursor: pointer;
+    }
+
+    &.dz-clickable * {
+      cursor: default;
+    }
+
+    &.dz-drag-hover .dz-message {
+      opacity: 0.5;
+    }
+
+    .dz-default.dz-message {
+      display: none;
+      text-align: center;
+      margin: 2em 0;
+    }
+
+    .dz-preview {
+      position: relative;
+      display: inline-block;
+      vertical-align: top;
+      margin: 16px;
+      border: 1px dashed #ffffff;
+      border-radius: 6px;
+      padding: 10px;
+    }
+
+    .dz-preview:hover {
+      z-index: 1000;
+      border-style: solid;
+    }
+
+    .dz-preview:hover .dz-details {
+      opacity: 1;
+    }
+
+    .dz-preview.dz-file-preview .dz-image {
+      border-radius: 20px;
+      background: #999;
+      background: linear-gradient(to bottom, #eee, #ddd);
+    }
+
+    .dz-preview.dz-file-preview .dz-details {
+      opacity: 1;
+    }
+
+    .dz-preview.dz-image-preview {
+      background: white;
+    }
+
+    .dz-preview.dz-image-preview .dz-details {
+      -webkit-transition: opacity 0.2s linear;
+      -moz-transition: opacity 0.2s linear;
+      -ms-transition: opacity 0.2s linear;
+      -o-transition: opacity 0.2s linear;
+      transition: opacity 0.2s linear;
+    }
+
+    .dz-preview .dz-success-mark svg, .dz-preview .dz-error-mark svg {
+      display: block;
+      width: 20px;
+      height: 20px;
+    }
+
+    .dz-preview.dz-image-preview {
+      background: none;
+    }
+
+    .dz-preview.dz-error > .dz-success-mark {
+      display: none;
+    }
+
+    .dz-preview.dz-success > .dz-error-mark {
+      display: none;
+    }
+
+    .dz-success-mark, .dz-error-mark {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+    }
+
+    .dz-preview.dz-image-preview {
+      padding-left: 70px;
+    }
+
+    .dz-preview.dz-image-preview .dz-image {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: -1;
+    }
+
+    .dz-preview.dz-image-preview .dz-image img {
+      max-width: 60px;
+    }
+
+  }
+}
