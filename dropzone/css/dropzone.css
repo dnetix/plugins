@@ -96,6 +96,9 @@
   left: 10px;
   z-index: -1;
 }
+.dropzone .dropzone .dz-preview.dz-file-preview .dz-image {
+  display: none;
+}
 .dropzone .dz-preview.dz-image-preview .dz-image img {
   max-width: 60px;
 }
