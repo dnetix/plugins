@@ -1,0 +1,176 @@
+.stock-g {
+    font: 10px sans-serif;
+    width: 100%;
+}
+
+.stock-g svg {
+}
+
+.stock-g .axis path,
+.stock-g .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.stock-g text.symbol {
+    fill: #BBBBBB;
+}
+
+.stock-g path {
+    fill: none;
+    stroke-width: 1;
+}
+
+.stock-g path.candle {
+    stroke: #000000;
+}
+
+.stock-g path.candle.body {
+    stroke-width: 0;
+}
+
+.stock-g path.candle.up {
+    fill: #00AA00;
+    stroke: #00AA00;
+}
+
+.stock-g path.candle.down {
+    fill: #FF0000;
+    stroke: #FF0000;
+}
+
+.stock-g .close.annotation.up {
+    opacity: 1;
+    font-size: 10px;
+}
+
+.stock-g .close.annotation.up path {
+    fill: #00AA00;
+    opacity: 1;
+}
+
+.stock-g path.volume {
+    fill: #DDDDDD;
+}
+
+.stock-g .indicator-plot path.line {
+    fill: none;
+    stroke-width: 1;
+}
+
+.stock-g .ma-0 path.line {
+    stroke: #1f77b4;
+}
+
+.stock-g .ma-1 path.line {
+    stroke: #aec7e8;
+}
+
+.stock-g .ma-2 path.line {
+    stroke: #ff7f0e;
+}
+
+.stock-g path.macd {
+    stroke: #0000AA;
+}
+
+.stock-g path.signal {
+    stroke: #FF9999;
+}
+
+.stock-g path.zero {
+    stroke: #BBBBBB;
+    stroke-dasharray: 0;
+    stroke-opacity: 0.5;
+}
+
+.stock-g path.difference {
+    fill: #BBBBBB;
+    opacity: 0.5;
+}
+
+.stock-g path.rsi {
+    stroke: #000000;
+}
+
+.stock-g path.overbought, .stock-g path.oversold {
+    stroke: #FF9999;
+    stroke-dasharray: 5, 5;
+}
+
+.stock-g path.middle, .stock-g path.zero {
+    stroke: #BBBBBB;
+    stroke-dasharray: 5, 5;
+}
+
+.stock-g .analysis path, .stock-g .analysis circle {
+    stroke: blue;
+    stroke-width: 0.8;
+}
+
+.stock-g .trendline circle {
+    stroke-width: 0;
+    display: none;
+}
+
+.stock-g .mouseover .trendline path {
+    stroke-width: 1.2;
+}
+
+.stock-g .mouseover .trendline circle {
+    stroke-width: 1;
+    display: inline;
+}
+
+.stock-g .dragging .trendline path, .stock-g .dragging .trendline circle {
+    stroke: darkblue;
+}
+
+.stock-g .interaction path, .stock-g .interaction circle {
+    pointer-events: all;
+}
+
+.stock-g .interaction .body {
+    cursor: move;
+}
+
+.stock-g .trendlines .interaction .start, .stock-g .trendlines .interaction .end {
+    cursor: nwse-resize;
+}
+
+.stock-g .supstance path {
+    stroke-dasharray: 2, 2;
+}
+
+.stock-g .supstances .interaction path {
+    pointer-events: all;
+    cursor: ns-resize;
+}
+
+.stock-g .mouseover .supstance path {
+    stroke-width: 1.5;
+}
+
+.stock-g .dragging .supstance path {
+    stroke: darkblue;
+}
+
+.stock-g .crosshair {
+    cursor: crosshair;
+}
+
+.stock-g .crosshair path.wire {
+    stroke: #DDDDDD;
+    stroke-dasharray: 1, 1;
+}
+
+.stock-g .crosshair .axisannotation path {
+    fill: #DDDDDD;
+}
+
+.stock-g .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
