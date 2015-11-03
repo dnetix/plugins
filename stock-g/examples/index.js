@@ -21,6 +21,10 @@ app.get('/rt', function(req, res, next){
     res.render('ohlc-realtime');
 });
 
+app.get('/intraday', function(req, res, next){
+    res.render('intraday');
+});
+
 var server = app.listen(process.argv[2] || 8080, function(){
     console.log("Express server running on " + server.address().port);
 });

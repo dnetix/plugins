@@ -1,11 +1,13 @@
 function StockG(container, symbolName, data, options){
 
     var self = this;
+
     this.data = data;
     this.container = d3.select(container);
     this._symbol = symbolName;
-
+    this.canZoom = true;
     this.totalWidth = parseInt(this.container.node().getBoundingClientRect().width);
+
     this.totalHeight = parseInt(this.container.node().getBoundingClientRect().height);
 
     this.opt = function(key, def){
@@ -14,7 +16,6 @@ function StockG(container, symbolName, data, options){
         }
         return def || null;
     };
-
     this.margins = {
         top: 20,
         right: 50,
@@ -25,7 +26,14 @@ function StockG(container, symbolName, data, options){
     this.mainDraw = this.opt("main", "ohlc");
 
     this.drawMACD = this.opt("macd", false);
+
     this.drawRSI = this.opt("rsi", false);
+
+    this.drawSma0 = this.opt("sma0", false);
+    this.drawSma1 = this.opt("sma1", false);
+    this.drawEma2 = this.opt("ema2", false);
+
+    this.parser = this.opt("parser", "mils");
 
     this.indicatorDimensions = {
         macd: {
@@ -109,6 +117,11 @@ function StockG(container, symbolName, data, options){
     var defs;
     var svg;
     var ohlcSelection;
+    var xIntraday;
+
+    var sma0;
+    var sma1;
+    var ema2;
 
     var indicatorSelection;
 
@@ -120,19 +133,31 @@ function StockG(container, symbolName, data, options){
 
         // Creation of elements base
         //parseDate = d3.time.format("%d-%b-%y").parse;
-        parseDate = function(mil){
-            return new Date(mil);
+        parseDate = function(d){
+            if(self.parser == "mils"){
+                return new Date(+d);
+            }else if(self.parser == "text"){
+                return new Date(d);
+            }else{
+                return d3.time.format(self.parser).parse(d);
+            }
         };
 
         zoom = d3.behavior.zoom()
             .scaleExtent([1, 20])
             .on("zoom", function(){
-                self.draw();
+                if(self.canZoom) {
+                    self.draw();
+                }
             });
         zoomPercent = d3.behavior.zoom();
 
         x = techan.scale.financetime()
             .range([0, self.canvasWidth()]);
+
+        xIntraday = d3.time.scale()
+            .range([0, self.canvasWidth()]);
+
         y = d3.scale.linear()
             .range([self.ohlcHeight(), 0]);
 
@@ -157,12 +182,12 @@ function StockG(container, symbolName, data, options){
             .yScale(yVolume);
 
         xAxis = d3.svg.axis()
-            .scale(x)
+            .scale(xIntraday)
             .orient("bottom");
 
         timeAnnotation = techan.plot.axisannotation()
             .axis(xAxis)
-            .format(d3.time.format('%Y-%m-%d'))
+            .format(d3.time.format(self.opt("nFormat", '%Y-%m-%d')))
             .width(65)
             .translate([0, self.canvasHeight()]);
 
@@ -363,6 +388,36 @@ function StockG(container, symbolName, data, options){
             .attr("class", "indicator-plot")
             .attr("clip-path", function(d, i) { return "url(#indicatorClip-" + i + ")"; });
 
+        if(self.drawSma0){
+            sma0 = techan.plot.sma()
+                .xScale(x)
+                .yScale(y);
+
+            ohlcSelection.append("g")
+                .attr("class", "indicator sma ma-0")
+                .attr("clip-path", "url(#ohlcClip)");
+        }
+
+        if(self.drawSma1){
+            sma1 = techan.plot.sma()
+                .xScale(x)
+                .yScale(y);
+
+            ohlcSelection.append("g")
+                .attr("class", "indicator sma ma-1")
+                .attr("clip-path", "url(#ohlcClip)");
+        }
+
+        if(self.drawEma2){
+            ema2 = techan.plot.ema()
+                .xScale(x)
+                .yScale(y);
+
+            ohlcSelection.append("g")
+                .attr("class", "indicator ema ma-2")
+                .attr("clip-path", "url(#ohlcClip)");
+        }
+
         // Crosshairs last to allow display even over candlesticks
 
         svg.append('g')
@@ -378,7 +433,7 @@ function StockG(container, symbolName, data, options){
     var parsedData;
     var macdData;
     var rsiData;
-    var indicatorPreRoll = 33;
+    var indicatorPreRoll = self.opt("preroll", 33);
 
     var zoomable;
 
@@ -413,6 +468,7 @@ function StockG(container, symbolName, data, options){
 
     this.preDraw = function(){
         x.domain(techan.scale.plot.time(parsedData).domain());
+        xIntraday.domain(d3.extent(parsedData.map(accessor.d)));
         y.domain(techan.scale.plot.ohlc(parsedData.slice(indicatorPreRoll)).domain());
 
         yPercent.domain(techan.scale.plot.percent(y, accessor(parsedData[indicatorPreRoll])).domain());
@@ -435,6 +491,15 @@ function StockG(container, symbolName, data, options){
             svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
             svg.select("g.crosshair.rsi").call(rsiCrosshair).call(zoom);
         }
+        if(self.drawSma0){
+            svg.select("g.sma.ma-0").datum(techan.indicator.sma().period(10)(parsedData)).call(sma0);
+        }
+        if(self.drawSma1){
+            svg.select("g.sma.ma-1").datum(techan.indicator.sma().period(20)(parsedData)).call(sma1);
+        }
+        if(self.drawEma2){
+            svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(50)(parsedData)).call(ema2);
+        }
 
         svg.select("g.crosshair.ohlc").call(ohlcCrosshair).call(zoom);
 
@@ -443,7 +508,7 @@ function StockG(container, symbolName, data, options){
 
         // Associate the zoom with the scale after a domain has been applied
         zoom.x(zoomable).y(y);
-        zoomPercent.y(yPercent);
+        zoomPercent.y(yPercent).x(xIntraday);
 
         self.draw();
     };
@@ -461,7 +526,7 @@ function StockG(container, symbolName, data, options){
         svg.select("g.percent.axis").call(percentAxis);
 
         // We know the data does not change, a simple refresh that does not perform data joins will suffice.
-        //svg.select("g.candlestick").call(candlestick.refresh);
+        svg.select("g.candlestick").call(candlestick.refresh);
         svg.select("g.close.annotation").call(closeAnnotation.refresh);
         svg.select("g.volume").call(volume.refresh);
         svg.select("g.crosshair.ohlc").call(ohlcCrosshair.refresh);
@@ -477,6 +542,15 @@ function StockG(container, symbolName, data, options){
             svg.select("g.rsi .axis.right").call(rsiAxis);
             svg.select("g.rsi .axis.left").call(rsiAxisLeft);
             svg.select("g.crosshair.rsi").call(rsiCrosshair.refresh);
+        }
+        if(self.drawSma0){
+            svg.select("g .sma.ma-0").call(sma0.refresh);
+        }
+        if(self.drawSma1){
+            svg.select("g .sma.ma-1").call(sma1.refresh);
+        }
+        if(self.drawEma2){
+            svg.select("g .ema.ma-2").call(ema2.refresh);
         }
     };
 
@@ -511,6 +585,30 @@ function StockG(container, symbolName, data, options){
         return self;
     };
 
+    this.setSma0 = function(s){
+        if(self.drawSma0 != s) {
+            self.drawSma0 = s;
+            self.reset();
+        }
+        return self;
+    };
+
+    this.setSma1 = function(s){
+        if(self.drawSma1 != s) {
+            self.drawSma1 = s;
+            self.reset();
+        }
+        return self;
+    };
+
+    this.setEma2 = function(s){
+        if(self.drawEma2 != s) {
+            self.drawEma2 = s;
+            self.reset();
+        }
+        return self;
+    };
+
     this.setMainDraw = function(type){
         if(type && type != self.mainDraw){
             self.mainDraw = type;
@@ -523,6 +621,10 @@ function StockG(container, symbolName, data, options){
         self._symbol = s;
         self.svg.select(".symbol").text(s);
         return self;
+    };
+
+    this.setZoom = function(bool){
+        self.canZoom = bool;
     };
 
     this.setup();

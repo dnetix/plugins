@@ -1,0 +1,116 @@
+<!doctype html>
+<!--[if IE 8 ]>
+<html class="ie ie8" lang="es">
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html lang="es" class="no-js">
+<![endif]-->
+<html lang="es">
+
+<head>
+    <title>Stock-G</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" media="screen">
+    <!--Needed Style-->
+    <link rel="stylesheet" href="stock-g/css/stock-g.css" type="text/css" media="screen">
+    <style>
+        body {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        rect.pane {
+            cursor: move;
+            fill: none;
+            pointer-events: all;
+        }
+    </style>
+</head>
+
+<body>
+<h1>Stock-G OHLC</h1>
+
+<script type="text/javascript" src="jquery/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!--This 3 scripts are required-->
+<script src="d3/d3.min.js"></script>
+<script src="techan/0.5.0/techan.min.js"></script>
+<script src="stock-g/js/stock-g.js"></script>
+<script>
+
+    var margin = {top: 20, right: 20, bottom: 30, left: 50},
+            width = 960 - margin.left - margin.right,
+            height = 200 - margin.top - margin.bottom;
+
+    var parseDate = d3.time.format("%d-%b-%y").parse;
+
+    var zoomTechan = d3.behavior.zoom()
+            .on("zoom", draw);
+
+    var zoomXIntraday = d3.behavior.zoom();
+
+    var xIntraday = d3.time.scale()
+            .range([0, width]);
+
+    var xAxisIntraday = d3.svg.axis()
+            .scale(xIntraday)
+            .orient("bottom");
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("g")
+            .attr("class", "x axis d3 intraday")
+            .attr("transform", "translate(0," + height + ")");
+
+    svg.append("rect")
+            .attr("class", "pane")
+            .attr("width", width)
+            .attr("height", height)
+            .call(zoomTechan);
+
+    // Generated with: http://www.google.com/finance/getprices?i=5&p=1d&f=d,o,h,l,c,v&df=cpct&q=GOOG
+    d3.csv("stock-g/examples/data/INTRADAY.csv", function (error, data) {
+        var accessor = techan.accessor.ohlc(),
+                date = new Date("2014-09-19 09:31"); // Snapshot was grabbed for 19 Sep 2014, market opens 9.30, first snapshot 9.31
+
+        data = data.map(function (d, i) {
+            return {
+                date: new Date(+date + (i * 60000)), // Minute per interval
+                open: +d.OPEN,
+                high: +d.HIGH,
+                low: +d.LOW,
+                close: +d.CLOSE,
+                volume: +d.VOLUME
+            };
+        }).sort(function (a, b) {
+            return d3.ascending(accessor.d(a), accessor.d(b));
+        });
+
+        xIntraday.domain(d3.extent(data.map(accessor.d)));
+        zoomXIntraday.x(xIntraday);
+        draw(); // Could this ever clash with the other data load?
+    });
+
+    function draw() {
+        zoomXIntraday.translate(zoomTechan.translate());
+        zoomXIntraday.scale(zoomTechan.scale());
+
+        svg.select("g.x.axis.d3.intraday").call(xAxisIntraday);
+    }
+
+</script>
+</body>
+
+</html>

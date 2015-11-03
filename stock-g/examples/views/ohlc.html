@@ -62,7 +62,7 @@
 
     function toggleData(){
         symbol = symbol == "GOOG" ? "AAPL" : "GOOG";
-        d3.csv('data/' + symbol + '.csv', function (data) {
+        d3.csv('stock-g/examples/data/' + symbol + '.csv', function (data) {
             cs.changeData(data).setSymbol(symbol);
         });
     }

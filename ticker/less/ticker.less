@@ -1,0 +1,66 @@
+@height: 29px;
+@background: #333;
+@text-color: #fff;
+@foreground: #326644;
+
+.ticker-container {
+  width: 100%;
+  height: @height;
+  box-sizing: border-box;
+  position: relative;
+  background: @background;
+  color: @text-color;
+  overflow: hidden;
+
+  .caption {
+    width: 15%;
+    background: @foreground;
+    font-weight: bold;
+    height: @height;
+    text-align: center;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 2px 0;
+
+    border-top: @foreground solid 30px;
+    border-right: @background solid 30px;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    span {
+      position: absolute;
+      top: -25px;
+      left: 10px;
+    }
+  }
+
+  .ticks-container {
+    width: 82%;
+    padding: 3px 5px;
+
+    position: absolute;
+    top: 0;
+    left: 16%;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: block;
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+
+      height: 24px;
+    }
+
+    transition-property: top;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+  }
+}
