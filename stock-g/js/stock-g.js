@@ -34,6 +34,7 @@ function StockG(container, symbolName, data, options){
     this.drawEma2 = this.opt("ema2", false);
 
     this.parser = this.opt("parser", "mils");
+    this.baseCounter = this.opt("base", 0);
 
     this.indicatorDimensions = {
         macd: {
@@ -117,7 +118,6 @@ function StockG(container, symbolName, data, options){
     var defs;
     var svg;
     var ohlcSelection;
-    var xIntraday;
 
     var sma0;
     var sma1;
@@ -132,9 +132,10 @@ function StockG(container, symbolName, data, options){
             .attr("height", self.totalHeight);
 
         // Creation of elements base
-        //parseDate = d3.time.format("%d-%b-%y").parse;
         parseDate = function(d){
-            if(self.parser == "mils"){
+            if(self.parser == "base"){
+                return new Date((self.baseCounter + (+d)) * 1000);
+            }else if(self.parser == "mils"){
                 return new Date(+d);
             }else if(self.parser == "text"){
                 return new Date(d);
@@ -153,9 +154,6 @@ function StockG(container, symbolName, data, options){
         zoomPercent = d3.behavior.zoom();
 
         x = techan.scale.financetime()
-            .range([0, self.canvasWidth()]);
-
-        xIntraday = d3.time.scale()
             .range([0, self.canvasWidth()]);
 
         y = d3.scale.linear()
@@ -182,13 +180,13 @@ function StockG(container, symbolName, data, options){
             .yScale(yVolume);
 
         xAxis = d3.svg.axis()
-            .scale(xIntraday)
+            .scale(x)
             .orient("bottom");
 
         timeAnnotation = techan.plot.axisannotation()
             .axis(xAxis)
             .format(d3.time.format(self.opt("nFormat", '%Y-%m-%d')))
-            .width(65)
+            .width(70)
             .translate([0, self.canvasHeight()]);
 
         yAxis = d3.svg.axis()
@@ -433,7 +431,7 @@ function StockG(container, symbolName, data, options){
     var parsedData;
     var macdData;
     var rsiData;
-    var indicatorPreRoll = self.opt("preroll", 33);
+    var indicatorPreRoll = self.opt("preroll", 10);
 
     var zoomable;
 
@@ -468,7 +466,6 @@ function StockG(container, symbolName, data, options){
 
     this.preDraw = function(){
         x.domain(techan.scale.plot.time(parsedData).domain());
-        xIntraday.domain(d3.extent(parsedData.map(accessor.d)));
         y.domain(techan.scale.plot.ohlc(parsedData.slice(indicatorPreRoll)).domain());
 
         yPercent.domain(techan.scale.plot.percent(y, accessor(parsedData[indicatorPreRoll])).domain());
@@ -508,7 +505,7 @@ function StockG(container, symbolName, data, options){
 
         // Associate the zoom with the scale after a domain has been applied
         zoom.x(zoomable).y(y);
-        zoomPercent.y(yPercent).x(xIntraday);
+        zoomPercent.y(yPercent);
 
         self.draw();
     };
