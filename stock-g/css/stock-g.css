@@ -81,10 +81,21 @@
   stroke: #BBBBBB;
   stroke-dasharray: 5, 5;
 }
-.stock-g .analysis path,
+.stock-g .supstances.analysis path,
 .stock-g .analysis circle {
   stroke: blue;
   stroke-width: 0.8;
+}
+.stock-g .supstances.analysis .axisannotation path {
+  fill: blue;
+}
+.stock-g .supstances.analysis .axisannotation text {
+  fill: #ffffff;
+}
+.stock-g .vline.analysis path {
+  stroke: #F1B900;
+  stroke-width: 0.8;
+  stroke-dasharray: 5, 5;
 }
 .stock-g .trendline circle {
   stroke-width: 0;

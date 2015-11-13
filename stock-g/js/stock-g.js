@@ -1,4 +1,6 @@
-function StockG(container, symbolName, data, options){
+var sele;
+
+function StockG(container, options, data, symbolName) {
 
     var self = this;
 
@@ -10,8 +12,8 @@ function StockG(container, symbolName, data, options){
 
     this.totalHeight = parseInt(this.container.node().getBoundingClientRect().height);
 
-    this.opt = function(key, def){
-        if(options && options[key]){
+    this.opt = function (key, def) {
+        if (options && options[key]) {
             return options[key];
         }
         return def || null;
@@ -46,41 +48,45 @@ function StockG(container, symbolName, data, options){
         padding: self.opt("padding", 10)
     };
 
-    this.canvasWidth = function(){
+    this.canvasWidth = function () {
         return self.totalWidth - self.margins.left - self.margins.right;
     };
 
-    this.canvasHeight = function(){
+    this.canvasHeight = function () {
         return self.totalHeight - self.margins.top - self.margins.bottom;
     };
 
-    this.symbol = function(){
+    this.symbol = function () {
         return self._symbol;
     };
 
-    this.ohlcHeight = function(){
+    this.supstances = this.opt("supstances", []);
+    this.vline = this.opt("vline", false);
+
+    this.ohlcHeight = function () {
         var height = self.canvasHeight();
-        if(self.drawMACD){
+        if (self.drawMACD) {
             height -= self.indicatorHeight("macd") + self.indicatorDimensions.padding;
         }
-        if(self.drawRSI){
+        if (self.drawRSI) {
             height -= self.indicatorHeight("rsi") + self.indicatorDimensions.padding;
         }
         return parseInt(height);
     };
 
     // Returns the y position for the indicator given
-    this.indicatorTop = function(indicatorName){
+    this.indicatorTop = function (indicatorName) {
         var position = self.ohlcHeight() + self.indicatorDimensions.padding;
-        if(indicatorName == "rsi" && self.drawMACD){
+        if (indicatorName == "rsi" && self.drawMACD) {
             position += self.indicatorHeight("macd") + self.indicatorDimensions.padding;
         }
         return parseInt(position);
     };
 
-    this.indicatorHeight = function(indicatorName){
+    this.indicatorHeight = function (indicatorName) {
         return parseInt(self.canvasHeight() * (self.indicatorDimensions[indicatorName].percent / 100));
     };
+
     // Global variables used
     var parseDate;
     var zoom;
@@ -119,36 +125,41 @@ function StockG(container, symbolName, data, options){
     var svg;
     var ohlcSelection;
 
+    var supstance;
+    var vLineContainer;
+
     var sma0;
     var sma1;
     var ema2;
 
     var indicatorSelection;
 
-    this.setup = function(){
+    this.setup = function () {
         // Create the new SVG canvas
         self.svg = d3.select(container).append("svg")
             .attr("width", self.totalWidth)
             .attr("height", self.totalHeight);
 
         // Creation of elements base
-        parseDate = function(d){
-            if(self.parser == "base"){
+        parseDate = function (d) {
+            if (self.parser == "base") {
                 return new Date((self.baseCounter + (+d)) * 1000);
-            }else if(self.parser == "mils"){
+            } else if (self.parser == "mils") {
                 return new Date(+d);
-            }else if(self.parser == "text"){
+            } else if (self.parser == "text") {
                 return new Date(d);
-            }else{
+            } else {
                 return d3.time.format(self.parser).parse(d);
             }
         };
 
         zoom = d3.behavior.zoom()
             .scaleExtent([1, 20])
-            .on("zoom", function(){
-                if(self.canZoom) {
+            .size([self.canvasWidth(), self.canvasHeight()])
+            .on("zoom", function () {
+                if (self.canZoom) {
                     self.draw();
+                    return true;
                 }
             });
         zoomPercent = d3.behavior.zoom();
@@ -164,11 +175,11 @@ function StockG(container, symbolName, data, options){
             .range([y(0), y(0.2)]);
 
         // Selects the kind of drawing ohlc or line
-        if(self.mainDraw == "line") {
+        if (self.mainDraw == "line") {
             candlestick = techan.plot.close()
                 .xScale(x)
                 .yScale(y);
-        }else{
+        } else {
             candlestick = techan.plot.candlestick()
                 .xScale(x)
                 .yScale(y);
@@ -229,7 +240,12 @@ function StockG(container, symbolName, data, options){
             .yAnnotation([ohlcAnnotation, percentAnnotation, volumeAnnotation])
             .verticalWireRange([0, self.canvasHeight()]);
 
-        if(self.drawMACD){
+        supstance = techan.plot.supstance()
+            .xScale(x)
+            .yScale(y)
+            .annotation([ohlcAnnotation, percentAnnotation]);
+
+        if (self.drawMACD) {
             macdScale = d3.scale.linear()
                 .range([self.indicatorTop("macd") + self.indicatorHeight("macd"), self.indicatorTop("macd")]);
 
@@ -264,7 +280,7 @@ function StockG(container, symbolName, data, options){
                 .verticalWireRange([0, self.canvasHeight()]);
         }
 
-        if(self.drawRSI){
+        if (self.drawRSI) {
             rsiScale = d3.scale.linear()
                 .range([self.indicatorTop("rsi") + self.indicatorHeight("rsi"), self.indicatorTop("rsi")]);
 
@@ -313,12 +329,18 @@ function StockG(container, symbolName, data, options){
         defs.selectAll("indicatorClip").data(["macd", "rsi"])
             .enter()
             .append("clipPath")
-            .attr("id", function(d, i) { return "indicatorClip-" + i; })
+            .attr("id", function (d, i) {
+                return "indicatorClip-" + i;
+            })
             .append("rect")
             .attr("x", 0)
-            .attr("y", function(d) { return self.indicatorTop(d); })
+            .attr("y", function (d) {
+                return self.indicatorTop(d);
+            })
             .attr("width", self.canvasWidth())
-            .attr("height", function(d) { return self.indicatorHeight(d); });
+            .attr("height", function (d) {
+                return self.indicatorHeight(d);
+            });
 
         svg = self.svg.append("g")
             .attr("transform", "translate(" + self.margins.left + "," + self.margins.top + ")");
@@ -331,13 +353,6 @@ function StockG(container, symbolName, data, options){
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + self.canvasHeight() + ")");
-
-        svg.append("g")
-            .attr("class", "trendlines analysis")
-            .attr("clip-path", "url(#ohlcClip)");
-        svg.append("g")
-            .attr("class", "supstances analysis")
-            .attr("clip-path", "url(#ohlcClip)");
 
         ohlcSelection = svg.append("g")
             .attr("class", "ohlc");
@@ -372,7 +387,9 @@ function StockG(container, symbolName, data, options){
         indicatorSelection = svg.selectAll("svg > g.indicator").data(["macd", "rsi"])
             .enter()
             .append("g")
-            .attr("class", function(d) { return d + " indicator"; });
+            .attr("class", function (d) {
+                return d + " indicator";
+            });
 
         indicatorSelection.append("g")
             .attr("class", "axis right")
@@ -384,9 +401,11 @@ function StockG(container, symbolName, data, options){
 
         indicatorSelection.append("g")
             .attr("class", "indicator-plot")
-            .attr("clip-path", function(d, i) { return "url(#indicatorClip-" + i + ")"; });
+            .attr("clip-path", function (d, i) {
+                return "url(#indicatorClip-" + i + ")";
+            });
 
-        if(self.drawSma0){
+        if (self.drawSma0) {
             sma0 = techan.plot.sma()
                 .xScale(x)
                 .yScale(y);
@@ -396,7 +415,7 @@ function StockG(container, symbolName, data, options){
                 .attr("clip-path", "url(#ohlcClip)");
         }
 
-        if(self.drawSma1){
+        if (self.drawSma1) {
             sma1 = techan.plot.sma()
                 .xScale(x)
                 .yScale(y);
@@ -406,7 +425,7 @@ function StockG(container, symbolName, data, options){
                 .attr("clip-path", "url(#ohlcClip)");
         }
 
-        if(self.drawEma2){
+        if (self.drawEma2) {
             ema2 = techan.plot.ema()
                 .xScale(x)
                 .yScale(y);
@@ -419,23 +438,48 @@ function StockG(container, symbolName, data, options){
         // Crosshairs last to allow display even over candlesticks
 
         svg.append('g')
-            .attr("class", "crosshair ohlc");
+            .attr("class", "crosshair ohlc")
+            .on("click", function () {
+                if(d3.event.ctrlKey) {
+                    var point = d3.mouse(this);
+                    var xClicked = x.invert(point[0]);
+
+                    var index = false;
+                    parsedData.find(function(e, i){
+                        if(e.date == xClicked){
+                            index = i;
+                            return true;
+                        }
+                    });
+
+                    self.emit("point", xClicked, y.invert(point[1]), point, index);
+                }
+            });
 
         svg.append('g')
             .attr("class", "crosshair macd");
 
         svg.append('g')
             .attr("class", "crosshair rsi");
+
+        // Supstance, horizontal lines over everything
+
+        svg.append('g')
+            .attr("class", "supstances analysis");
+
+        vLineContainer = svg.append('g')
+            .attr("class", "vline analysis");
     };
+
     var accessor;
     var parsedData;
     var macdData;
     var rsiData;
-    var indicatorPreRoll = self.opt("preroll", 10);
+    var indicatorPreRoll = self.opt("preroll", 1);
 
     var zoomable;
 
-    this.setData = function(data) {
+    this.setData = function (data) {
         accessor = candlestick.accessor();
         parsedData = data.map(function (d) {
             return {
@@ -452,19 +496,53 @@ function StockG(container, symbolName, data, options){
         return self;
     };
 
-    this.updateData = function(data){
+    this.updateData = function (data) {
         self.setData(data);
         self.preDraw();
         return self;
     };
 
-    this.changeData = function(data){
+    this.changeData = function (data) {
         self.setData(data);
         self.reset();
         return self;
     };
 
-    this.preDraw = function(){
+    // Creating a new vline for the graph
+    function vLine(){
+        var exists = !vLineContainer.select("path").empty();
+        if(self.vline) {
+            if(!exists) {
+                vLineContainer
+                    .append("path")
+                    .attr("d", function () {
+                        return "M " + x(parseDate(self.vline)) + " 0 V " + self.canvasHeight();
+                    });
+            }else{
+                vLine.refresh();
+            }
+        }else{
+            if(exists){
+                vLineContainer.select("path").remove();
+            }
+        }
+    }
+    vLine.refresh = function(){
+        vLineContainer.select("path").attr("d", function(){
+            return "M " + x(parseDate(self.vline)) + " 0 V " + self.canvasHeight();
+        });
+    };
+
+    function vSupstances() {
+        svg.select("g.supstances").datum(self.supstances).call(supstance).call(supstance.drag);
+    }
+    vSupstances.refresh = function(){
+        if (self.supstances.length > 0) {
+            svg.select("g.supstances").call(supstance.refresh);
+        }
+    };
+
+    this.preDraw = function () {
         x.domain(techan.scale.plot.time(parsedData).domain());
         y.domain(techan.scale.plot.ohlc(parsedData.slice(indicatorPreRoll)).domain());
 
@@ -472,31 +550,34 @@ function StockG(container, symbolName, data, options){
         yVolume.domain(techan.scale.plot.volume(parsedData).domain());
 
         svg.select("g.candlestick").datum(parsedData).call(candlestick);
-        svg.select("g.close.annotation").datum([parsedData[parsedData.length-1]]).call(closeAnnotation);
+        svg.select("g.close.annotation").datum([parsedData[parsedData.length - 1]]).call(closeAnnotation);
 
         svg.select("g.volume").datum(parsedData).call(volume);
 
-        if(self.drawMACD){
+        if (self.drawMACD) {
             macdData = techan.indicator.macd()(parsedData);
             macdScale.domain(techan.scale.plot.macd(macdData).domain());
             svg.select("g.macd .indicator-plot").datum(macdData).call(macd);
             svg.select("g.crosshair.macd").call(macdCrosshair).call(zoom);
         }
-        if(self.drawRSI){
+        if (self.drawRSI) {
             rsiData = techan.indicator.rsi()(parsedData);
             rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
             svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
             svg.select("g.crosshair.rsi").call(rsiCrosshair).call(zoom);
         }
-        if(self.drawSma0){
+        if (self.drawSma0) {
             svg.select("g.sma.ma-0").datum(techan.indicator.sma().period(10)(parsedData)).call(sma0);
         }
-        if(self.drawSma1){
+        if (self.drawSma1) {
             svg.select("g.sma.ma-1").datum(techan.indicator.sma().period(20)(parsedData)).call(sma1);
         }
-        if(self.drawEma2){
+        if (self.drawEma2) {
             svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(50)(parsedData)).call(ema2);
         }
+
+        vSupstances();
+        vLine();
 
         svg.select("g.crosshair.ohlc").call(ohlcCrosshair).call(zoom);
 
@@ -510,7 +591,7 @@ function StockG(container, symbolName, data, options){
         self.draw();
     };
 
-    this.draw = function(){
+    this.draw = function () {
         zoomPercent.translate(zoom.translate());
         zoomPercent.scale(zoom.scale());
 
@@ -528,106 +609,404 @@ function StockG(container, symbolName, data, options){
         svg.select("g.volume").call(volume.refresh);
         svg.select("g.crosshair.ohlc").call(ohlcCrosshair.refresh);
 
-        if(self.drawMACD){
+        if (self.drawMACD) {
             svg.select("g.macd .indicator-plot").call(macd.refresh);
             svg.select("g.macd .axis.right").call(macdAxis);
             svg.select("g.macd .axis.left").call(macdAxisLeft);
             svg.select("g.crosshair.macd").call(macdCrosshair.refresh);
         }
-        if(self.drawRSI){
+        if (self.drawRSI) {
             svg.select("g.rsi .indicator-plot").call(rsi.refresh);
             svg.select("g.rsi .axis.right").call(rsiAxis);
             svg.select("g.rsi .axis.left").call(rsiAxisLeft);
             svg.select("g.crosshair.rsi").call(rsiCrosshair.refresh);
         }
-        if(self.drawSma0){
+        if (self.drawSma0) {
             svg.select("g .sma.ma-0").call(sma0.refresh);
         }
-        if(self.drawSma1){
+        if (self.drawSma1) {
             svg.select("g .sma.ma-1").call(sma1.refresh);
         }
-        if(self.drawEma2){
+        if (self.drawEma2) {
             svg.select("g .ema.ma-2").call(ema2.refresh);
         }
+
+        vSupstances.refresh();
+        vLine.refresh();
     };
 
-    this.reset = function(){
+    this.parseDate = function(d){
+        return parseDate(d);
+    };
+
+    this.reset = function () {
         self.svg.remove();
         self.setup();
         self.preDraw();
         return self;
     };
 
-    this.setPercentTicks = function(number){
+    this.setPercentTicks = function (number) {
         percentAxis.ticks(number);
         self.draw();
         return self;
     };
 
-    this.setMACD = function(s, percent){
+    this.setMACD = function (s, percent) {
         self.drawMACD = s;
-        if(s && percent){
+        if (s && percent) {
             self.indicatorDimensions.macd.percent = percent;
         }
         self.reset();
         return self;
     };
 
-    this.setRSI = function(s, percent){
+    this.setRSI = function (s, percent) {
         self.drawRSI = s;
-        if(s && percent){
+        if (s && percent) {
             self.indicatorDimensions.rsi.percent = percent;
         }
         self.reset();
         return self;
     };
 
-    this.setSma0 = function(s){
-        if(self.drawSma0 != s) {
+    this.setSma0 = function (s) {
+        if (self.drawSma0 != s) {
             self.drawSma0 = s;
             self.reset();
         }
         return self;
     };
 
-    this.setSma1 = function(s){
-        if(self.drawSma1 != s) {
+    this.setSma1 = function (s) {
+        if (self.drawSma1 != s) {
             self.drawSma1 = s;
             self.reset();
         }
         return self;
     };
 
-    this.setEma2 = function(s){
-        if(self.drawEma2 != s) {
+    this.setEma2 = function (s) {
+        if (self.drawEma2 != s) {
             self.drawEma2 = s;
             self.reset();
         }
         return self;
     };
 
-    this.setMainDraw = function(type){
-        if(type && type != self.mainDraw){
+    this.addSupstance = function (value) {
+        self.supstances.push({
+            value: value
+        });
+        vSupstances();
+        return self;
+    };
+
+    this.setMainDraw = function (type) {
+        if (type && type != self.mainDraw) {
             self.mainDraw = type;
             self.reset();
         }
         return self;
     };
 
-    this.setSymbol = function(s){
+    this.setSymbol = function (s) {
         self._symbol = s;
         self.svg.select(".symbol").text(s);
         return self;
     };
 
-    this.setZoom = function(bool){
+    this.setVLine = function(x){
+        self.vline = x;
+        vLine();
+    };
+
+    this.setZoom = function (bool) {
         self.canZoom = bool;
     };
 
     this.setup();
 
-    if(data) {
+    if (data) {
         this.updateData(data);
     }
 
 }
+
+// --------------------------------------------------------------------------------
+
+
+// EventEmmiter Part, to use it without node
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      }
+      throw TypeError('Uncaught, unspecified "error" event.');
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+StockG.prototype = new EventEmitter();
