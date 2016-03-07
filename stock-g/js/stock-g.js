@@ -256,7 +256,7 @@
         }, {} ],
         2: [ function(require, module, exports) {
             "use strict";
-            module.exports = "1.0.0";
+            module.exports = "1.0.1";
         }, {} ],
         3: [ function(require, module, exports) {
             "use strict";
@@ -268,14 +268,16 @@
                     version: require("../build/version"),
                     create: require("./stockg"),
                     panel: require("./panel"),
-                    settings: require("./settings")
+                    settings: require("./settings"),
+                    remote: require("./remote")
                 };
             }();
         }, {
             "../build/version": 2,
             "./panel": 4,
-            "./settings": 5,
-            "./stockg": 6
+            "./remote": 5,
+            "./settings": 6,
+            "./stockg": 7
         } ],
         4: [ function(require, module, exports) {
             function Panel(selector, core, options) {
@@ -312,7 +314,7 @@
                     if (currentDraw) {
                         if (currentDraw == "supstance") {
                             var value = y.invert(point[1]);
-                            core.addDraw("supstances", createSupstance(value));
+                            core.draws("supstances", createSupstance(value));
                             cleanActions();
                         } else if (currentDraw == "trendline") {
                             if (_p1) {
@@ -320,7 +322,7 @@
                                     date: x.invert(point[0]),
                                     value: y.invert(point[1])
                                 };
-                                core.addDraw("trendlines", createTrendline(_p1, _p2));
+                                core.draws("trendlines", createTrendline(_p1, _p2));
                                 cleanActions();
                             } else {
                                 // First Point
@@ -334,10 +336,10 @@
                             if (event.ctrlKey) {
                                 type = "sell";
                             }
-                            core.addDraw("trades", {
+                            core.draws("trades", {
                                 date: element.date,
                                 type: type,
-                                price: element.low,
+                                price: element.close,
                                 low: element.low,
                                 high: element.high
                             });
@@ -449,9 +451,45 @@
             }
             module.exports = Panel;
         }, {
-            "./settings": 5
+            "./settings": 6
         } ],
         5: [ function(require, module, exports) {
+            /**
+ * Adds some sort of interface to handle external operations over the stock-g chart
+ * @param core
+ * @param options
+ * @constructor
+ */
+            function Remote(core, options) {
+                // Creates one arrow at one point, if there is some then it removes them
+                this.addSingleArrow = function(element, type) {
+                    // The only things needed are the x (date) point, and the price to point out, but if you can send all the element, better
+                    core.clearDraws("trades");
+                    if (!element.price) {
+                        element["price"] = element.low;
+                    }
+                    if (type) {
+                        element["type"] = type;
+                    }
+                    core.draws("trades", element);
+                };
+                // This one its used when you want to display in the chart the trades maded, trades need to have a date, type and price
+                this.addTrades = function(trades, clear) {
+                    if (clear) {
+                        core.clearDraws("trades");
+                    }
+                    trades.filter(function(a) {
+                        if (a.date && a.type && a.price) {
+                            core.draws("trades", a);
+                            return true;
+                        }
+                        return false;
+                    });
+                };
+            }
+            module.exports = Remote;
+        }, {} ],
+        6: [ function(require, module, exports) {
             module.exports = function(options) {
                 var settings = {
                     zoom: true,
@@ -510,7 +548,7 @@
                 return settings;
             };
         }, {} ],
-        6: [ function(require, module, exports) {
+        7: [ function(require, module, exports) {
             "use strict";
             var events = require("events");
             function Core(selector, data, options) {
@@ -759,10 +797,12 @@
                     analysisSelection.append("g").attr("class", "trades").attr("clip-path", "url(#chartClip)");
                 }
                 function reset() {
-                    self.svg.remove();
-                    setup();
-                    draw();
-                    self.emit("update");
+                    if (self.svg) {
+                        self.svg.remove();
+                        setup();
+                        draw();
+                        self.emit("update");
+                    }
                 }
                 function parseData(data) {
                     accessor = charter.accessor();
@@ -771,9 +811,20 @@
                     });
                     return self;
                 }
+                this.options = function(options) {
+                    if (arguments.length == 0) {
+                        return settings;
+                    }
+                    for (var key in options) {
+                        settings[key] = options[key];
+                    }
+                    reset();
+                    return self;
+                };
                 this.setName = function(name) {
                     settings.symbol = name;
                     svg.select("text.name").text(name);
+                    return self;
                 };
                 this.xScale = function() {
                     return x;
@@ -781,23 +832,23 @@
                 this.yScale = function() {
                     return y;
                 };
-                this.draws = function() {
-                    return draws;
-                };
-                this.addDraw = function(type, d) {
-                    d["id"] = draws.id;
-                    draws.id++;
+                this.draws = function(type, d) {
+                    if (arguments.length == 0) {
+                        return draws;
+                    }
+                    d["id"] = ++draws.id;
                     draws[type].push(d);
                     refresh();
-                    return d.id;
+                    return d;
                 };
-                this.clearDraws = function() {
-                    draws = {
-                        id: 0,
-                        supstances: [],
-                        trendlines: [],
-                        trades: []
-                    };
+                this.clearDraws = function(type) {
+                    var _draws = require("./settings")()["draws"];
+                    // Obtains the default draws settings
+                    if (type) {
+                        draws[type] = _draws[type];
+                        return true;
+                    }
+                    draws = _draws;
                     refresh();
                 };
                 this.macd = function(a, percent) {
@@ -856,6 +907,7 @@
                     }
                     parseData(d);
                     reset();
+                    return self;
                 };
                 this.addTick = function(tick, shift) {
                     parsedData.push(dataParser(tick));
@@ -871,6 +923,7 @@
                         return settings.zoom;
                     }
                     settings.zoom = a;
+                    return self;
                 };
                 this.pause = function(a) {
                     if (arguments.length == 0) {
@@ -880,9 +933,11 @@
                     if (!a) {
                         reset();
                     }
+                    return self;
                 };
                 this.reset = function() {
                     reset();
+                    return self;
                 };
                 // Resets the dimensions if the window resizes
                 window.onresize = function() {
@@ -904,11 +959,11 @@
             Core.prototype = new events.EventEmitter();
             module.exports = Core;
         }, {
-            "./settings": 5,
-            "./tradearrow": 7,
+            "./settings": 6,
+            "./tradearrow": 8,
             events: 1
         } ],
-        7: [ function(require, module, exports) {
+        8: [ function(require, module, exports) {
             // Container function
             module.exports = function() {
                 var _x;
@@ -921,24 +976,30 @@
                     return "M 0 0 l -6 7.5 l 4 0 l 0 7.5 l 4 0 l 0 -7.5 l 4 0 z";
                 }
                 function translation(a) {
-                    var price = a.low;
-                    var mod = 5;
-                    if (a.type == "sell") {
-                        price = a.high;
-                        mod = -5;
+                    var price = a.price, mod = 0;
+                    if (a.type && a.low && a.high) {
+                        if (a.type == "sell") {
+                            price = a.high;
+                            mod = -5;
+                        } else {
+                            price = a.low;
+                            mod = 5;
+                        }
                     }
                     return "translate(" + _x(a.date) + "," + (_y(price) + mod) + ")";
                 }
                 function tradearrow(g) {
                     _data = g.data()[0];
                     var group = g.selectAll("g").data(_data);
+                    // If exists, then translate it to the point
                     group.attr("transform", translation);
+                    // If doesnt exist well, make it
                     group.enter().append("g").attr("class", function(a) {
                         return "tradearrow " + a.type;
-                    }).attr("transform", translation).on("click", function(a) {
-                        console.log(this);
-                        console.log("TEST");
-                    }).append("path").attr("d", pathDirection);
+                    }).attr("id", function(a) {
+                        return "arrow_" + a.id;
+                    }).attr("transform", translation).append("path").attr("d", pathDirection);
+                    // If not needed anymore, remove it
                     group.exit().remove();
                 }
                 tradearrow.refresh = function(g) {};

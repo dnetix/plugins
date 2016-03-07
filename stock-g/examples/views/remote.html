@@ -60,11 +60,8 @@
             <input type="button" class="btn btn-primary" id="exampleMinutes" value="Data in minutes">
             <input type="button" class="btn btn-primary" id="exampleDays" value="Data in days">
             <hr />
-            <span>It can be used also to display data that comes in "real time" to see a example</span>
-            <a href="/realtime" class="btn btn-primary">View in "real time"</a>
-            <hr />
-            <span>It has a remote variable that has an API to use with the chart</span>
-            <a href="/remote" class="btn btn-primary">View remote</a>
+            <span>Go back to the first example</span>
+            <a href="/" class="btn btn-primary">Go back</a>
         </div>
     </section>
 
@@ -78,7 +75,19 @@
     <script src="stock-g/js/stock-g.js"></script>
 
     <script>
-        var stockg, gData, panel;
+        var stockg, gData, stockRemote;
+
+        stockg = new StockG.create('#gcontainer');
+        stockRemote = new StockG.remote(stockg);
+
+        var defaultOptions = StockG.settings();
+
+        // The cool stuff that this example demonstrates
+        // The library triggers a event when its clicked
+        stockg.on('point', function(point, element, event){
+            // Point its an array, element its the tick, and the event its a d3 event... log it
+            stockRemote.addSingleArrow(element, 'buy');
+        });
 
         $(document).ready(function () {
             $("#exampleMinutes").on('click', function(){
@@ -92,19 +101,21 @@
                 };
 
                 d3.json('stock-g/examples/data/minutes.txt', function (data) {
-                    stockg = new StockG.create('#gcontainer', data, options);
-                    panel = new StockG.panel('#panel', stockg);
+                    stockg.options(options).setData(data).setName("MINUTES");
                 });
             });
 
             $("#exampleDays").on('click', function(){
+                // Gets the options by default
                 d3.csv('stock-g/examples/data/AAPL.csv', function (data) {
-                    stockg = new StockG.create('#gcontainer', data);
-                    panel = new StockG.panel('#panel', stockg);
+                    stockg.options(defaultOptions).setData(data).setName("DAYS");
                 });
             });
 
-            stockg = new StockG.create('#gcontainer');
+            d3.csv('stock-g/examples/data/AAPL.csv', function (data) {
+                stockg.options(defaultOptions).setData(data).setName("DAYS");
+            });
+
         });
     </script>
 </body>

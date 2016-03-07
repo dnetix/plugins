@@ -38,7 +38,7 @@ function Panel(selector, core, options){
         if(currentDraw){
             if(currentDraw == 'supstance'){
                 var value = y.invert(point[1]);
-                core.addDraw('supstances', createSupstance(value));
+                core.draws('supstances', createSupstance(value));
                 cleanActions();
             }else if(currentDraw == 'trendline'){
                 if(_p1){
@@ -46,7 +46,7 @@ function Panel(selector, core, options){
                         date: x.invert(point[0]),
                         value: y.invert(point[1])
                     };
-                    core.addDraw('trendlines', createTrendline(_p1, _p2));
+                    core.draws('trendlines', createTrendline(_p1, _p2));
                     cleanActions();
                 }else{
                     // First Point
@@ -62,10 +62,10 @@ function Panel(selector, core, options){
                     type = 'sell';
                 }
 
-                core.addDraw('trades', {
+                core.draws('trades', {
                     date: element.date,
                     type: type,
-                    price: element.low,
+                    price: element.close,
                     low: element.low,
                     high: element.high
                 });

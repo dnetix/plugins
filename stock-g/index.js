@@ -17,8 +17,12 @@ app.get('/', function(req, res, next){
     res.render('index');
 });
 
-app.get('/rt', function(req, res, next){
+app.get('/realtime', function(req, res, next){
     res.render('realtime');
+});
+
+app.get('/remote', function(req, res, next){
+    res.render('remote');
 });
 
 var server = app.listen(process.argv[2] || 8080, function(){

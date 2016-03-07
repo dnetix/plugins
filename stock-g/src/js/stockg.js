@@ -448,10 +448,12 @@ function Core(selector, data, options) {
     }
 
     function reset(){
-        self.svg.remove();
-        setup();
-        draw();
-        self.emit('update');
+        if(self.svg) {
+            self.svg.remove();
+            setup();
+            draw();
+            self.emit('update');
+        }
     }
 
     function parseData(data){
@@ -462,9 +464,21 @@ function Core(selector, data, options) {
         return self;
     }
 
+    this.options = function(options){
+        if(arguments.length == 0){
+            return settings;
+        }
+        for (var key in options){
+            settings[key] = options[key];
+        }
+        reset();
+        return self;
+    };
+
     this.setName = function(name){
         settings.symbol = name;
         svg.select("text.name").text(name);
+        return self;
     };
 
     this.xScale = function(){
@@ -475,24 +489,24 @@ function Core(selector, data, options) {
         return y;
     };
 
-    this.draws = function(){
-        return draws;
-    };
-
-    this.addDraw = function(type, d){
-        d['id'] = draws.id;
-        draws.id++;
+    this.draws = function(type, d){
+        if(arguments.length == 0){
+            return draws;
+        }
+        d['id'] = ++draws.id;
         draws[type].push(d);
         refresh();
-        return d.id;
+
+        return d;
     };
-    this.clearDraws = function(){
-        draws = {
-            id: 0,
-            supstances: [],
-            trendlines: [],
-            trades: []
-        };
+    this.clearDraws = function(type){
+        var _draws = require('./settings')()['draws'];
+        // Obtains the default draws settings
+        if(type){
+            draws[type] = _draws[type];
+            return true;
+        }
+        draws = _draws;
         refresh();
     };
 
@@ -543,6 +557,7 @@ function Core(selector, data, options) {
         if(!initiated){ setup(); }
         parseData(d);
         reset();
+        return self;
     };
     this.addTick = function(tick, shift){
         parsedData.push(dataParser(tick));
@@ -559,6 +574,7 @@ function Core(selector, data, options) {
             return settings.zoom;
         }
         settings.zoom = a;
+        return self;
     };
     this.pause = function(a){
         if(arguments.length == 0){
@@ -566,10 +582,12 @@ function Core(selector, data, options) {
         }
         settings.pause = a;
         if(!a){ reset() }
+        return self;
     };
 
     this.reset = function(){
         reset();
+        return self;
     };
 
     // Resets the dimensions if the window resizes

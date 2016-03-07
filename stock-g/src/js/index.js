@@ -10,6 +10,7 @@ module.exports = (function(){
         version: require('../build/version'),
         create: require('./stockg'),
         panel: require('./panel'),
-        settings: require('./settings')
+        settings: require('./settings'),
+        remote: require('./remote')
     }
 })();
