@@ -1,0 +1,341 @@
+@import "configuration";
+
+.stock-g {
+  // Sets always the full size of the container
+  width: 100%;
+
+  .name {
+    fill: @symbol-name-color;
+    font-size: @symbol-name-size;
+  }
+
+  .axis {
+    path, line {
+      fill: none;
+      stroke: @axis-color;
+      shape-rendering: crispEdges;
+    }
+    text {
+      fill: @axis-text-color;
+      font-size: @axis-text-size;
+    }
+  }
+
+  .chart {
+    .last-close.annotation {
+      path {
+        fill: @close-annotation-color;
+      }
+      text {
+        fill: @close-annotation-text-color;
+        font-size: @axis-text-size;
+      }
+    }
+
+    .ohlc {
+      // When the chart type its line
+      .data path.line {
+        fill: none;
+        stroke: @draw-line-color;
+        stroke-width: @draw-line-width;
+      }
+
+      // When the chart type its ohlc
+      .data {
+        path.candle {
+          stroke-width: 0;
+
+          &.up {
+            fill: @candle-up-color;
+            stroke: @candle-up-stroke;
+          }
+          &.down {
+            fill: @candle-down-color;
+            stroke: @candle-down-stroke;
+          }
+        }
+      }
+    }
+
+    .volume {
+      path {
+        fill: @volume-fill-color;
+      }
+
+      path.domain {
+        fill: none;
+      }
+    }
+
+    .indicator {
+      path {
+        fill: none;
+        stroke-width: @indicator-width;
+      }
+
+      &.ma-0 path {
+        stroke: @sma0-stroke;
+      }
+
+      &.ma-1 path {
+        stroke: @sma1-stroke;
+      }
+
+      &.ma-2 path {
+        stroke: @ema2-stroke;
+      }
+    }
+  }
+
+  .indicator {
+    .indicator-plot path {
+      fill: none;
+      stroke-width: @indicator-stroke-width;
+    }
+
+    &.macd {
+      path.macd {
+        stroke: @macd-color;
+      }
+      path.signal {
+        stroke: @macd-signal-color;
+      }
+      path.zero {
+        stroke: @macd-zero-color;
+        stroke-dasharray: @macd-zero-dasharray;
+        opacity: @macd-zero-opacity;
+      }
+      path.difference {
+        fill: @macd-difference-color;
+        opacity: @macd-difference-opacity;
+      }
+    }
+
+    &.rsi {
+      path.rsi {
+        stroke: @rsi-color;
+      }
+      path.overbought {
+        stroke: @rsi-overbought-color;
+        stroke-dasharray: @rsi-over-dasharray;
+      }
+      path.middle {
+        stroke: @rsi-middle-color;
+        stroke-dasharray: @rsi-over-dasharray;
+      }
+      path.oversold {
+        stroke: @rsi-oversold-color;
+        stroke-dasharray: @rsi-over-dasharray;
+      }
+    }
+  }
+
+  .crosshair {
+    cursor: crosshair;
+    path.wire {
+      stroke: @crosshair-wire-color;
+      stroke-dasharray: @crosshair-wire-dasharray;
+    }
+
+    .axisannotation {
+      path {
+        fill: @crosshair-axisannotation-color;
+      }
+      text {
+        fill: @crosshair-text-color;
+        font-size: @crosshair-text-size;
+      }
+    }
+  }
+
+  .analysis {
+    .supstances {
+      .supstance path {
+        stroke: @supstance-line-color;
+        stroke-width: @supstance-line-width;
+        stroke-dasharray: @supstance-line-dasharray;
+      }
+      .axisannotation {
+        path {
+          fill: @supstance-annotation-color;
+        }
+        text {
+          fill: @supstance-annotation-text-color;
+          font-size: @supstance-annotation-text-size;
+        }
+      }
+      .interaction {
+        path, circle {
+          pointer-events: all;
+          cursor: ns-resize;
+        }
+      }
+
+      & .mouseover {
+        .supstance path {
+          stroke-width: @supstance-line-width-over;
+        }
+      }
+
+      & .dragging {
+        .supstance path {
+          stroke: @supstance-line-color-dragging;
+        }
+      }
+    }
+    .trendlines {
+      .trendline {
+        path {
+          stroke: @trendline-color;
+          stroke-width: @trendline-width;
+        }
+        circle {
+          stroke-width: 0;
+          display: none;
+        }
+      }
+      .interaction {
+        path, circle {
+          pointer-events: all;
+        }
+        .body {
+          cursor: move;
+        }
+        .start, .end {
+          cursor: nwse-resize;
+        }
+      }
+
+      & .mouseover {
+        .trendline {
+          path {
+            stroke-width: @trendline-width-over;
+          }
+        }
+      }
+
+      & .dragging {
+        .trendline {
+          path {
+            stroke: @trendline-color-dragging;
+          }
+        }
+      }
+    }
+
+    .trades {
+      .tradearrow path {
+        stroke: @tradearrow-line-color;
+        fill: @tradearrow-fill-color;
+      }
+    }
+  }
+
+  .no-data {
+    width: 100%;
+    height: 100%;
+    display: table;
+    background: url('no-data.png') center no-repeat;
+
+    .no-data-content {
+      display: table-cell;
+      vertical-align: middle;
+      padding: 0 50px;
+
+      p {
+        opacity: 0.8;
+        padding: 0 30px;
+        text-align: center;
+        font-size: 1.8em;
+      }
+    }
+  }
+
+}
+
+.stock-panel {
+  text-align: center;
+
+  g.buttons {
+    display: inline-block;
+
+    &.options, &.draw {
+      padding-left: 10px;
+      margin-left: 10px;
+      border-left: solid 1px #CCCCCC;
+    }
+  }
+
+  .buttons {
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+        margin: 0 2px;
+        border: solid 1px #CCCCCC;
+        border-radius: 2px;
+        box-sizing: border-box;
+
+        background-image: @background-image;
+
+        &.active {
+          border: solid 1px #0074d9;
+        }
+      }
+    }
+
+    .supstance {
+      .icon-pos(0, 0);
+    }
+
+    .trendline {
+      .icon-pos(1, 0);
+    }
+
+    .trade {
+      .icon-pos(2, 0);
+    }
+
+    .cancel {
+      .icon-pos(3, 0);
+    }
+
+    .clear {
+      .icon-pos(4, 0);
+    }
+
+    .macd {
+      .icon-pos(5, 0);
+    }
+
+    .rsi {
+      .icon-pos(6, 0);
+    }
+
+    .sma0 {
+      .icon-pos(7, 0);
+    }
+
+    .sma1 {
+      .icon-pos(8, 0);
+    }
+
+    .ema2 {
+      .icon-pos(9, 0);
+    }
+
+    .pause {
+      .icon-pos(10, 0);
+    }
+
+    .zoom {
+      .icon-pos(11, 0);
+    }
+
+  }
+}

@@ -1,0 +1,71 @@
+@draw-line-color: #001f3f;
+@draw-line-width: 1.5;
+
+@candle-up-color: #2ecc40;
+@candle-up-stroke: @candle-up-color;
+@candle-down-color: #ffdc00;
+@candle-down-stroke: @candle-down-color;
+
+@axis-color: #000000;
+@axis-text-color: #000000;
+@axis-text-size: 10px;
+
+@symbol-name-color: #DDDDDD;
+@symbol-name-size: 20px;
+
+@close-annotation-color: #3d9970;
+@close-annotation-text-color: #FFFFFF;
+
+@volume-fill-color: #BBBBBB;
+
+@indicator-width: 1;
+@indicator-width-hover: 2;
+@sma0-stroke: #ff581b;
+@sma1-stroke: #ff4136;
+@ema2-stroke: #b10dc9;
+
+@indicator-stroke-width: 1;
+
+@macd-color: #001d3f;
+@macd-signal-color: #ff851b;
+@macd-difference-color: #bbbbbb;
+@macd-difference-opacity: 0.5;
+@macd-zero-color: #bbbbbb;
+@macd-zero-dasharray: 0;
+@macd-zero-opacity: 0.7;
+
+@rsi-color: #001d3f;
+@rsi-overbought-color: #85144b;
+@rsi-middle-color: #BBBBBB;
+@rsi-oversold-color: #85144b;
+@rsi-middle-dasharray: 1;
+@rsi-over-dasharray: 5, 5;
+
+@crosshair-wire-color: #dddddd;
+@crosshair-wire-dasharray: 1, 1;
+@crosshair-axisannotation-color: #dddddd;
+@crosshair-text-color: #000000;
+@crosshair-text-size: 10px;
+
+@supstance-line-color: #0074D9;
+@supstance-line-color-dragging: #001F3F;
+@supstance-line-width: 0.8;
+@supstance-line-width-over: 1.5;
+@supstance-line-dasharray: 2, 2;
+@supstance-annotation-color: #0074D9;
+@supstance-annotation-text-color: #ffffff;
+@supstance-annotation-text-size: 10px;
+
+@trendline-color: #0074d9;
+@trendline-color-dragging: #001f3f;
+@trendline-width: 1.5;
+@trendline-width-over: 2;
+
+@tradearrow-line-color: #DDDDDD;
+@tradearrow-fill-color: #FF0000;
+
+@background-image: url('icons.png');
+
+.icon-pos(@number, @yPos){
+  background-position: (@number * -26px) (@yPos * -26px);
+}

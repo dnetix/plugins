@@ -1,153 +1,242 @@
 .stock-g {
-  font: 10px sans-serif;
   width: 100%;
+}
+.stock-g .name {
+  fill: #DDDDDD;
+  font-size: 20px;
 }
 .stock-g .axis path,
 .stock-g .axis line {
   fill: none;
-  stroke: #000;
+  stroke: #000000;
   shape-rendering: crispEdges;
 }
-.stock-g text.symbol {
-  fill: #BBBBBB;
-}
-.stock-g path {
-  fill: none;
-  stroke-width: 1;
-}
-.stock-g path.candle {
-  stroke: #000000;
-}
-.stock-g path.candle.body {
-  stroke-width: 0;
-}
-.stock-g path.candle.up {
-  fill: #00AA00;
-  stroke: #00AA00;
-}
-.stock-g path.candle.down {
-  fill: #F1B900;
-  stroke: #F1B900;
-}
-.stock-g .close.annotation.up {
-  opacity: 1;
+.stock-g .axis text {
+  fill: #000000;
   font-size: 10px;
 }
-.stock-g .close.annotation.up path {
-  fill: #00AA00;
-  opacity: 1;
+.stock-g .chart .last-close.annotation path {
+  fill: #3d9970;
 }
-.stock-g path.volume {
-  fill: #999999;
+.stock-g .chart .last-close.annotation text {
+  fill: #FFFFFF;
+  font-size: 10px;
 }
-.stock-g .indicator-plot path.line {
+.stock-g .chart .ohlc .data path.line {
+  fill: none;
+  stroke: #001f3f;
+  stroke-width: 1.5;
+}
+.stock-g .chart .ohlc .data path.candle {
+  stroke-width: 0;
+}
+.stock-g .chart .ohlc .data path.candle.up {
+  fill: #2ecc40;
+  stroke: #2ecc40;
+}
+.stock-g .chart .ohlc .data path.candle.down {
+  fill: #ffdc00;
+  stroke: #ffdc00;
+}
+.stock-g .chart .volume path {
+  fill: #BBBBBB;
+}
+.stock-g .chart .volume path.domain {
+  fill: none;
+}
+.stock-g .chart .indicator path {
   fill: none;
   stroke-width: 1;
 }
-.stock-g .ma-0 path.line {
-  stroke: #1f77b4;
+.stock-g .chart .indicator.ma-0 path {
+  stroke: #ff581b;
 }
-.stock-g .ma-1 path.line {
-  stroke: #aec7e8;
+.stock-g .chart .indicator.ma-1 path {
+  stroke: #ff4136;
 }
-.stock-g .ma-2 path.line {
-  stroke: #ff7f0e;
+.stock-g .chart .indicator.ma-2 path {
+  stroke: #b10dc9;
 }
-.stock-g path.macd {
-  stroke: #0000AA;
+.stock-g .indicator .indicator-plot path {
+  fill: none;
+  stroke-width: 1;
 }
-.stock-g path.signal {
-  stroke: #FF9999;
+.stock-g .indicator.macd path.macd {
+  stroke: #001d3f;
 }
-.stock-g path.zero {
-  stroke: #BBBBBB;
+.stock-g .indicator.macd path.signal {
+  stroke: #ff851b;
+}
+.stock-g .indicator.macd path.zero {
+  stroke: #bbbbbb;
   stroke-dasharray: 0;
-  stroke-opacity: 0.5;
+  opacity: 0.7;
 }
-.stock-g path.difference {
-  fill: #BBBBBB;
+.stock-g .indicator.macd path.difference {
+  fill: #bbbbbb;
   opacity: 0.5;
 }
-.stock-g path.rsi {
-  stroke: #000000;
+.stock-g .indicator.rsi path.rsi {
+  stroke: #001d3f;
 }
-.stock-g path.overbought,
-.stock-g path.oversold {
-  stroke: #FF9999;
+.stock-g .indicator.rsi path.overbought {
+  stroke: #85144b;
   stroke-dasharray: 5, 5;
 }
-.stock-g path.middle,
-.stock-g path.zero {
+.stock-g .indicator.rsi path.middle {
   stroke: #BBBBBB;
   stroke-dasharray: 5, 5;
 }
-.stock-g .supstances.analysis path,
-.stock-g .analysis circle {
-  stroke: blue;
-  stroke-width: 0.8;
-}
-.stock-g .supstances.analysis .axisannotation path {
-  fill: blue;
-}
-.stock-g .supstances.analysis .axisannotation text {
-  fill: #ffffff;
-}
-.stock-g .vline.analysis path {
-  stroke: #F1B900;
-  stroke-width: 0.8;
+.stock-g .indicator.rsi path.oversold {
+  stroke: #85144b;
   stroke-dasharray: 5, 5;
-}
-.stock-g .trendline circle {
-  stroke-width: 0;
-  display: none;
-}
-.stock-g .mouseover .trendline path {
-  stroke-width: 1.2;
-}
-.stock-g .mouseover .trendline circle {
-  stroke-width: 1;
-  display: inline;
-}
-.stock-g .dragging .trendline path,
-.stock-g .dragging .trendline circle {
-  stroke: darkblue;
-}
-.stock-g .interaction path,
-.stock-g .interaction circle {
-  pointer-events: all;
-}
-.stock-g .interaction .body {
-  cursor: move;
-}
-.stock-g .trendlines .interaction .start,
-.stock-g .trendlines .interaction .end {
-  cursor: nwse-resize;
-}
-.stock-g .supstance path {
-  stroke-dasharray: 2, 2;
-}
-.stock-g .supstances .interaction path {
-  pointer-events: all;
-  cursor: ns-resize;
-}
-.stock-g .mouseover .supstance path {
-  stroke-width: 1.5;
-}
-.stock-g .dragging .supstance path {
-  stroke: darkblue;
 }
 .stock-g .crosshair {
   cursor: crosshair;
 }
 .stock-g .crosshair path.wire {
-  stroke: #DDDDDD;
+  stroke: #dddddd;
   stroke-dasharray: 1, 1;
 }
 .stock-g .crosshair .axisannotation path {
-  fill: #DDDDDD;
+  fill: #dddddd;
 }
-.stock-g .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+.stock-g .crosshair .axisannotation text {
+  fill: #000000;
+  font-size: 10px;
+}
+.stock-g .analysis .supstances .supstance path {
+  stroke: #0074D9;
+  stroke-width: 0.8;
+  stroke-dasharray: 2, 2;
+}
+.stock-g .analysis .supstances .axisannotation path {
+  fill: #0074D9;
+}
+.stock-g .analysis .supstances .axisannotation text {
+  fill: #ffffff;
+  font-size: 10px;
+}
+.stock-g .analysis .supstances .interaction path,
+.stock-g .analysis .supstances .interaction circle {
+  pointer-events: all;
+  cursor: ns-resize;
+}
+.stock-g .analysis .supstances .mouseover .supstance path {
+  stroke-width: 1.5;
+}
+.stock-g .analysis .supstances .dragging .supstance path {
+  stroke: #001F3F;
+}
+.stock-g .analysis .trendlines .trendline path {
+  stroke: #0074d9;
+  stroke-width: 1.5;
+}
+.stock-g .analysis .trendlines .trendline circle {
+  stroke-width: 0;
+  display: none;
+}
+.stock-g .analysis .trendlines .interaction path,
+.stock-g .analysis .trendlines .interaction circle {
+  pointer-events: all;
+}
+.stock-g .analysis .trendlines .interaction .body {
+  cursor: move;
+}
+.stock-g .analysis .trendlines .interaction .start,
+.stock-g .analysis .trendlines .interaction .end {
+  cursor: nwse-resize;
+}
+.stock-g .analysis .trendlines .mouseover .trendline path {
+  stroke-width: 2;
+}
+.stock-g .analysis .trendlines .dragging .trendline path {
+  stroke: #001f3f;
+}
+.stock-g .analysis .trades .tradearrow path {
+  stroke: #DDDDDD;
+  fill: #FF0000;
+}
+.stock-g .no-data {
+  width: 100%;
+  height: 100%;
+  display: table;
+  background: url('no-data.png') center no-repeat;
+}
+.stock-g .no-data .no-data-content {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 0 50px;
+}
+.stock-g .no-data .no-data-content p {
+  opacity: 0.8;
+  padding: 0 30px;
+  text-align: center;
+  font-size: 1.8em;
+}
+.stock-panel {
+  text-align: center;
+}
+.stock-panel g.buttons {
+  display: inline-block;
+}
+.stock-panel g.buttons.options,
+.stock-panel g.buttons.draw {
+  padding-left: 10px;
+  margin-left: 10px;
+  border-left: solid 1px #CCCCCC;
+}
+.stock-panel .buttons ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.stock-panel .buttons ul li {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin: 0 2px;
+  border: solid 1px #CCCCCC;
+  border-radius: 2px;
+  box-sizing: border-box;
+  background-image: url('icons.png');
+}
+.stock-panel .buttons ul li.active {
+  border: solid 1px #0074d9;
+}
+.stock-panel .buttons .supstance {
+  background-position: 0px 0px;
+}
+.stock-panel .buttons .trendline {
+  background-position: -26px 0px;
+}
+.stock-panel .buttons .trade {
+  background-position: -52px 0px;
+}
+.stock-panel .buttons .cancel {
+  background-position: -78px 0px;
+}
+.stock-panel .buttons .clear {
+  background-position: -104px 0px;
+}
+.stock-panel .buttons .macd {
+  background-position: -130px 0px;
+}
+.stock-panel .buttons .rsi {
+  background-position: -156px 0px;
+}
+.stock-panel .buttons .sma0 {
+  background-position: -182px 0px;
+}
+.stock-panel .buttons .sma1 {
+  background-position: -208px 0px;
+}
+.stock-panel .buttons .ema2 {
+  background-position: -234px 0px;
+}
+.stock-panel .buttons .pause {
+  background-position: -260px 0px;
+}
+.stock-panel .buttons .zoom {
+  background-position: -286px 0px;
 }

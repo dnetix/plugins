@@ -5,20 +5,20 @@ var swig = require('swig');
 
 app.engine('html', swig.renderFile);
 app.set('view engine', 'html');
-app.set('views', __dirname + '/views');
+app.set('views', __dirname + '/examples/views');
 // Disable SWIG caching for development
 app.set('view cache', false);
 swig.setDefaults({ cache: false });
 
-app.use(express.static(path.resolve(__dirname, '../../')));
+app.use(express.static(path.resolve(__dirname, '../')));
 
 // The two routes to use for the examples
 app.get('/', function(req, res, next){
-    res.render('ohlc');
+    res.render('index');
 });
 
 app.get('/rt', function(req, res, next){
-    res.render('ohlc-realtime');
+    res.render('realtime');
 });
 
 var server = app.listen(process.argv[2] || 8080, function(){

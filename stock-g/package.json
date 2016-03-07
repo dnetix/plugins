@@ -1,0 +1,22 @@
+{
+  "name": "stock-g",
+  "version": "1.0.0",
+  "description": "Stock charting and technical analysis library built on techanjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Diego Calle",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.13.3",
+    "swig": "^1.4.2"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^4.0.1",
+    "grunt-contrib-less": "^1.2.0",
+    "grunt-contrib-uglify": "^0.11.1",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}

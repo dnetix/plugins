@@ -1,0 +1,109 @@
+<!doctype html>
+<!--[if IE 8 ]>
+<html class="ie ie8" lang="es">
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html lang="es" class="no-js">
+<![endif]-->
+<html lang="es">
+
+<head>
+    <title>Stock-G</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" media="screen">
+    <style>
+        .header {
+            background: #111111;
+        }
+        .header h2 {
+            color: #ffffff;
+            padding-bottom: 10px;
+        }
+        .chart {
+            padding: 15px 0;
+        }
+        .explain {
+            background: #001f3f;
+            color: #ffffff;
+            padding: 20px 0;
+        }
+        .explain span {
+            font-size: 1.3em;
+            padding-right: 25px;
+        }
+    </style>
+    <!--Needed Style-->
+    <link rel="stylesheet" href="stock-g/css/stock-g.css" type="text/css" media="screen">
+</head>
+
+<body>
+    <section class="header">
+        <div class="container">
+            <h2>StockG Financial OHLC plotting assistant</h2>
+        </div>
+    </section>
+    <section class="chart">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- Dont forget to set the height and classes -->
+                    <div id="gcontainer" class="stock-g" style="height: 500px;"></div>
+                    <div id="panel" class="stock-panel"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="explain">
+        <div class="container">
+            <span>Select one of the data sources to display in the chart</span>
+            <input type="button" class="btn btn-primary" id="exampleMinutes" value="Data in minutes">
+            <input type="button" class="btn btn-primary" id="exampleDays" value="Data in days">
+            <hr />
+            <span>It can be used also to display data that comes in "real time" to see a example</span>
+            <a href="/rt" class="btn btn-primary">View in "real time"</a>
+        </div>
+    </section>
+
+    <!--Just for the purpouse of the example, not required-->
+    <script type="text/javascript" src="jquery/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!--This 3 scripts are required-->
+    <script src="d3/d3.min.js"></script>
+    <script src="techan/0.6.0/techan.min.js"></script>
+    <script src="stock-g/js/stock-g.js"></script>
+
+    <script>
+        var stockg, gData, panel;
+
+        $(document).ready(function () {
+            $("#exampleMinutes").on('click', function(){
+                function parserMinutes(d) {
+                    return new Date(((+d * 60) + 1457154000) * 1000);
+                }
+
+                var options = {
+                    nFormat: '%H:%M',
+                    parser: parserMinutes
+                };
+
+                d3.json('stock-g/examples/data/minutes.txt', function (data) {
+                    stockg = new StockG.create('#gcontainer', data, options);
+                    panel = new StockG.panel('#panel', stockg);
+                });
+            });
+
+            $("#exampleDays").on('click', function(){
+                d3.csv('stock-g/examples/data/AAPL.csv', function (data) {
+                    stockg = new StockG.create('#gcontainer', data);
+                    panel = new StockG.panel('#panel', stockg);
+                });
+            });
+
+            stockg = new StockG.create('#gcontainer');
+        });
+    </script>
+</body>
+
+</html>
