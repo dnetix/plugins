@@ -256,7 +256,7 @@
         }, {} ],
         2: [ function(require, module, exports) {
             "use strict";
-            module.exports = "1.0.1";
+            module.exports = "1.0.2";
         }, {} ],
         3: [ function(require, module, exports) {
             "use strict";
@@ -781,14 +781,14 @@
                     svg.append("g").attr("class", "crosshair chart").on("click", function() {
                         var point = d3.mouse(this);
                         var xClicked = x.invert(point[0]);
-                        var element = false;
-                        parsedData.find(function(e, i) {
-                            if (e.date == xClicked) {
-                                e["index"] = i;
-                                element = e;
-                                return true;
+                        var element = false, i = 0;
+                        // Find the element in the array
+                        while (i < parsedData.length && !element) {
+                            if (parsedData[i].date == xClicked) {
+                                element = parsedData[i];
                             }
-                        });
+                            i++;
+                        }
                         self.emit("point", point, element, d3.event);
                     });
                     analysisSelection = svg.append("g").attr("class", "analysis");
