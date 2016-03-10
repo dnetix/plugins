@@ -256,7 +256,7 @@
         }, {} ],
         2: [ function(require, module, exports) {
             "use strict";
-            module.exports = "1.0.2";
+            module.exports = "1.0.3";
         }, {} ],
         3: [ function(require, module, exports) {
             "use strict";
@@ -823,7 +823,9 @@
                 };
                 this.setName = function(name) {
                     settings.symbol = name;
-                    svg.select("text.name").text(name);
+                    if (svg) {
+                        svg.select("text.name").text(name);
+                    }
                     return self;
                 };
                 this.xScale = function() {

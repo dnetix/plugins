@@ -477,7 +477,9 @@ function Core(selector, data, options) {
 
     this.setName = function(name){
         settings.symbol = name;
-        svg.select("text.name").text(name);
+        if(svg) {
+            svg.select("text.name").text(name);
+        }
         return self;
     };
 
