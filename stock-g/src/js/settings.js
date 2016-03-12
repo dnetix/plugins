@@ -41,7 +41,7 @@ module.exports = function(options){
             hint_supstance: "Dibujar substancia",
             hint_trendline: "Dibujar tendencia",
             hint_trade: "Dibujar flecha en tick",
-            hint_cancel: "Cancela el dibujo pendiente",
+            hint_reset: "Devuelve la grafica a su posición inicial",
             hint_clear: "Limpia todos los dibujos de analisis",
             hint_macd: "Activa o desactiva la grafica MACD",
             hint_rsi: "Activa o desactiva la grafica RSI",

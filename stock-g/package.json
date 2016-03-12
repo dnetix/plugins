@@ -1,6 +1,6 @@
 {
   "name": "stock-g",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Stock charting and technical analysis library built on techanjs",
   "main": "index.js",
   "scripts": {

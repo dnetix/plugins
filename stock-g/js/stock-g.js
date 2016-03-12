@@ -256,7 +256,7 @@
         }, {} ],
         2: [ function(require, module, exports) {
             "use strict";
-            module.exports = "1.0.3";
+            module.exports = "1.0.4";
         }, {} ],
         3: [ function(require, module, exports) {
             "use strict";
@@ -350,21 +350,24 @@
                 function buttonListener() {
                     var element = d3.select(this);
                     var elementClass = element.attr("class");
-                    if (elementClass == "cancel") {
-                        cleanActions();
+                    if (elementClass == "reset") {
+                        core.reset();
                     } else if (elementClass == "clear") {
                         core.clearDraws();
                         cleanActions();
                     } else {
-                        // Disables the movement of the chart
-                        core.zoom(false);
-                        core.reset();
-                        // Removes all the active class
-                        buttons.selectAll("li").classed("active", false);
-                        element.classed("active", true);
-                        currentDraw = elementClass;
-                        _p1 = null;
-                        _p2 = null;
+                        if (element.classed("active")) {
+                            cleanActions();
+                        } else {
+                            // Disables the movement of the chart
+                            core.zoom(false);
+                            // Removes all the active class
+                            buttons.selectAll("li").classed("active", false);
+                            element.classed("active", true);
+                            currentDraw = elementClass;
+                            _p1 = null;
+                            _p2 = null;
+                        }
                     }
                 }
                 function buttonOptionListener() {
@@ -438,7 +441,7 @@
                     buttons.append("li").attr("class", "supstance").attr("data-hint", settings.lang.hint_supstance).on("click", buttonListener);
                     buttons.append("li").attr("class", "trendline").attr("data-hint", settings.lang.hint_trendline).on("click", buttonListener);
                     buttons.append("li").attr("class", "trade").attr("data-hint", settings.lang.hint_trade).on("click", buttonListener);
-                    buttons.append("li").attr("class", "cancel").attr("data-hint", settings.lang.hint_cancel).on("click", buttonListener);
+                    buttons.append("li").attr("class", "reset").attr("data-hint", settings.lang.hint_reset).on("click", buttonListener);
                     buttons.append("li").attr("class", "clear").attr("data-hint", settings.lang.hint_clear).on("click", buttonListener);
                     buttonsOption = container.append("g").attr("class", "buttons options").append("ul");
                     buttonsOption.append("li").attr("class", "macd" + (core.macd() ? " active" : "")).attr("data-hint", settings.lang.hint_macd).on("click", buttonOptionListener);
@@ -533,7 +536,7 @@
                         hint_supstance: "Dibujar substancia",
                         hint_trendline: "Dibujar tendencia",
                         hint_trade: "Dibujar flecha en tick",
-                        hint_cancel: "Cancela el dibujo pendiente",
+                        hint_reset: "Devuelve la grafica a su posición inicial",
                         hint_clear: "Limpia todos los dibujos de analisis",
                         hint_macd: "Activa o desactiva la grafica MACD",
                         hint_rsi: "Activa o desactiva la grafica RSI",

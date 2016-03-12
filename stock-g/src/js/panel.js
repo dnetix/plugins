@@ -77,22 +77,25 @@ function Panel(selector, core, options){
     function buttonListener(){
         var element = d3.select(this);
         var elementClass = element.attr('class');
-        if(elementClass == 'cancel'){
-            cleanActions();
+        if(elementClass == 'reset'){
+            core.reset();
         }else if(elementClass == 'clear') {
             core.clearDraws();
             cleanActions();
         } else {
-            // Disables the movement of the chart
-            core.zoom(false);
-            core.reset();
-            // Removes all the active class
-            buttons.selectAll('li').classed('active', false);
-            element.classed('active', true);
+            if(element.classed('active')){
+                cleanActions();
+            }else {
+                // Disables the movement of the chart
+                core.zoom(false);
+                // Removes all the active class
+                buttons.selectAll('li').classed('active', false);
+                element.classed('active', true);
 
-            currentDraw = elementClass;
-            _p1 = null;
-            _p2 = null;
+                currentDraw = elementClass;
+                _p1 = null;
+                _p2 = null;
+            }
         }
     }
 
@@ -193,8 +196,8 @@ function Panel(selector, core, options){
             .attr('data-hint', settings.lang.hint_trade)
             .on('click', buttonListener);
         buttons.append('li')
-            .attr('class', 'cancel')
-            .attr('data-hint', settings.lang.hint_cancel)
+            .attr('class', 'reset')
+            .attr('data-hint', settings.lang.hint_reset)
             .on('click', buttonListener);
         buttons.append('li')
             .attr('class', 'clear')
