@@ -41,20 +41,20 @@ function Panel(selector, core, options){
                 core.draws('supstances', createSupstance(value));
                 cleanActions();
             }else if(currentDraw == 'trendline'){
-                if(_p1){
-                    _p2 = {
-                        date: x.invert(point[0]),
-                        value: y.invert(point[1])
-                    };
-                    core.draws('trendlines', createTrendline(_p1, _p2));
-                    cleanActions();
-                }else{
-                    // First Point
-                    _p1 = {
-                        date: x.invert(point[0]),
-                        value: y.invert(point[1])
-                    };
-                }
+                var a = point[0] - 50;
+                var b = point[0] + 50;
+
+                _p1 = {
+                    date: x.invert(a < 0 ? 0 : a),
+                    value: y.invert(point[1])
+                };
+
+                _p2 = {
+                    date: x.invert(b > core.dimensions().canvasWidth ? core.dimensions().canvasWidth : b),
+                    value: y.invert(point[1])
+                };
+                core.draws('trendlines', createTrendline(_p1, _p2));
+                cleanActions();
             }else if(currentDraw == 'trade'){
                 var type = 'buy';
 

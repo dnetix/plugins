@@ -22,6 +22,7 @@ module.exports = function(options){
         padding: 10,
         supstances: [],
         preroll: 2,
+        postroll: 50,
         nFormat: '%Y-%m-%d',
         symbol: '',
         sma0_period: 10,

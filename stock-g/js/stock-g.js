@@ -256,7 +256,7 @@
         }, {} ],
         2: [ function(require, module, exports) {
             "use strict";
-            module.exports = "1.0.4";
+            module.exports = "1.0.5";
         }, {} ],
         3: [ function(require, module, exports) {
             "use strict";
@@ -317,20 +317,18 @@
                             core.draws("supstances", createSupstance(value));
                             cleanActions();
                         } else if (currentDraw == "trendline") {
-                            if (_p1) {
-                                _p2 = {
-                                    date: x.invert(point[0]),
-                                    value: y.invert(point[1])
-                                };
-                                core.draws("trendlines", createTrendline(_p1, _p2));
-                                cleanActions();
-                            } else {
-                                // First Point
-                                _p1 = {
-                                    date: x.invert(point[0]),
-                                    value: y.invert(point[1])
-                                };
-                            }
+                            var a = point[0] - 50;
+                            var b = point[0] + 50;
+                            _p1 = {
+                                date: x.invert(a < 0 ? 0 : a),
+                                value: y.invert(point[1])
+                            };
+                            _p2 = {
+                                date: x.invert(b > core.dimensions().canvasWidth ? core.dimensions().canvasWidth : b),
+                                value: y.invert(point[1])
+                            };
+                            core.draws("trendlines", createTrendline(_p1, _p2));
+                            cleanActions();
                         } else if (currentDraw == "trade") {
                             var type = "buy";
                             if (event.ctrlKey) {
@@ -517,6 +515,7 @@
                     padding: 10,
                     supstances: [],
                     preroll: 2,
+                    postroll: 50,
                     nFormat: "%Y-%m-%d",
                     symbol: "",
                     sma0_period: 10,
@@ -580,7 +579,7 @@
                 }
                 var dimensions;
                 // Variables to the chart
-                var parsedData = [], preroll = settings.preroll, accessor;
+                var parsedData = [], preroll = settings.preroll, accessor, postrollData = [];
                 var svg, dateParser, x, y, xAxis, yAxis, yPercent, volume, volumeAxis, yVolume, chartAnnotation, chartCrosshair, percentAnnotation, timeAnnotation, closeAnnotation, volumeAnnotation, percentAxis, charter, clips, chartSelection, indicatorSelection, analysisSelection;
                 var zoom, zoomable, zoomPercent;
                 var sma0, sma1, ema2;
@@ -590,6 +589,24 @@
                 var rsiData, rsi, rsiScale, rsiAxis, rsiAnnotation, rsiAxisLeft, rsiAnnotationLeft, rsiCrosshair;
                 // Analysis variables
                 var trendline, supstance, tradearrow;
+                function showData() {
+                    return parsedData.concat(postrollData);
+                }
+                function updatePostroll() {
+                    var base = parsedData[parsedData.length - 1];
+                    var diff = base.date - parsedData[parsedData.length - 2].date;
+                    var close = accessor.c(base);
+                    postrollData = [];
+                    for (var i = 1; i < settings.postroll; i++) {
+                        postrollData.push({
+                            date: new Date(+base.date + diff * i),
+                            close: close,
+                            open: close,
+                            low: close,
+                            high: close
+                        });
+                    }
+                }
                 function dataParser(d) {
                     return {
                         date: dateParser(d.Date),
@@ -640,34 +657,34 @@
                     svg.select("g.analysis .trades").datum(draws.trades).call(tradearrow);
                 }
                 function draw() {
-                    x.domain(techan.scale.plot.time(parsedData).domain());
-                    y.domain(techan.scale.plot.ohlc(parsedData.slice(preroll)).domain());
-                    yPercent.domain(techan.scale.plot.percent(y, accessor(parsedData[preroll])).domain());
-                    yVolume.domain(techan.scale.plot.volume(parsedData).domain());
-                    svg.select("g.ohlc").datum(parsedData).call(charter);
-                    svg.select("g.last-close.annotation").datum([ parsedData[parsedData.length - 1] ]).call(closeAnnotation);
-                    svg.select("g.volume").datum(parsedData).call(volume);
+                    x.domain(techan.scale.plot.time(showData()).domain());
+                    y.domain(techan.scale.plot.ohlc(showData().slice(preroll)).domain());
+                    yPercent.domain(techan.scale.plot.percent(y, accessor(showData()[preroll])).domain());
+                    yVolume.domain(techan.scale.plot.volume(showData()).domain());
+                    svg.select("g.ohlc").datum(showData()).call(charter);
+                    svg.select("g.last-close.annotation").datum([ showData()[parsedData.length - 1] ]).call(closeAnnotation);
+                    svg.select("g.volume").datum(showData()).call(volume);
                     // Conditionals
                     if (settings.macd) {
-                        macdData = techan.indicator.macd()(parsedData);
+                        macdData = techan.indicator.macd()(showData());
                         macdScale.domain(techan.scale.plot.macd(macdData).domain());
                         svg.select("g.macd .indicator-plot").datum(macdData).call(macd);
                         svg.select("g.crosshair.macd").call(macdCrosshair).call(zoom);
                     }
                     if (settings.rsi) {
-                        rsiData = techan.indicator.rsi()(parsedData);
+                        rsiData = techan.indicator.rsi()(showData());
                         rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
                         svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
                         svg.select("g.crosshair.rsi").call(rsiCrosshair).call(zoom);
                     }
                     if (settings.sma0) {
-                        svg.select("g.sma.ma-0").datum(techan.indicator.sma().period(settings.sma0_period)(parsedData)).call(sma0);
+                        svg.select("g.sma.ma-0").datum(techan.indicator.sma().period(settings.sma0_period)(showData())).call(sma0);
                     }
                     if (settings.sma1) {
-                        svg.select("g.sma.ma-1").datum(techan.indicator.sma().period(settings.sma1_period)(parsedData)).call(sma1);
+                        svg.select("g.sma.ma-1").datum(techan.indicator.sma().period(settings.sma1_period)(showData())).call(sma1);
                     }
                     if (settings.ema2) {
-                        svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(settings.ema2_period)(parsedData)).call(ema2);
+                        svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(settings.ema2_period)(showData())).call(ema2);
                     }
                     // Call the zoom HERE
                     svg.select("g.crosshair.chart").call(chartCrosshair).call(zoom);
@@ -786,9 +803,9 @@
                         var xClicked = x.invert(point[0]);
                         var element = false, i = 0;
                         // Find the element in the array
-                        while (i < parsedData.length && !element) {
-                            if (parsedData[i].date == xClicked) {
-                                element = parsedData[i];
+                        while (i < showData().length && !element) {
+                            if (showData()[i].date == xClicked) {
+                                element = showData()[i];
                             }
                             i++;
                         }
@@ -806,12 +823,15 @@
                         draw();
                         self.emit("update");
                     }
+                    return self;
                 }
                 function parseData(data) {
                     accessor = charter.accessor();
                     parsedData = data.map(dataParser).sort(function(a, b) {
                         return a.date - b.date;
                     });
+                    // Creates the new data that will serve as blank canvas
+                    updatePostroll();
                     return self;
                 }
                 this.options = function(options) {
@@ -855,6 +875,7 @@
                     }
                     draws = _draws;
                     refresh();
+                    return self;
                 };
                 this.macd = function(a, percent) {
                     if (arguments.length == 0) {
@@ -865,6 +886,7 @@
                         settings.macd_height = percent;
                     }
                     reset();
+                    return self;
                 };
                 this.rsi = function(a, percent) {
                     if (arguments.length == 0) {
@@ -875,6 +897,7 @@
                         settings.rsi_height = percent;
                     }
                     reset();
+                    return self;
                 };
                 this.sma0 = function(a, period) {
                     if (arguments.length == 0) {
@@ -885,6 +908,7 @@
                         settings.sma0_period = period;
                     }
                     reset();
+                    return self;
                 };
                 this.sma1 = function(a, period) {
                     if (arguments.length == 0) {
@@ -895,6 +919,7 @@
                         settings.sma1_period = period;
                     }
                     reset();
+                    return self;
                 };
                 this.ema2 = function(a, period) {
                     if (arguments.length == 0) {
@@ -905,6 +930,10 @@
                         settings.ema2_period = period;
                     }
                     reset();
+                    return self;
+                };
+                this.dimensions = function() {
+                    return dimensions;
                 };
                 this.setData = function(d) {
                     if (!initiated) {
@@ -919,9 +948,11 @@
                     if (shift) {
                         parsedData.shift();
                     }
+                    updatePostroll();
                     if (!settings.pause) {
                         reset();
                     }
+                    return self;
                 };
                 this.zoom = function(a) {
                     if (arguments.length == 0) {
