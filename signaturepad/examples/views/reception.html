@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signature Pad Examples</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <style>
+        .signature {
+            border: solid 1px #CCCCCC;
+            min-height: 160px;
+        }
+        .type span {
+            display: block;
+        }
+        .type textarea {
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Receiving the data</h1>
+
+    <div class="col-md-8 col-md-offset-2">
+        <form action="/reception">
+            <div class="form-group">
+                <label class="control-label">Nombre</label>
+                <h3>{{ name }}</h3>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="signature">Firma</label>
+                <div class="signature" id="signature"></div>
+            </div>
+
+            <div class="image">
+                <h5>Image</h5>
+                <img src="{{ image_data }}">
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/jquery/jquery-1.11.3.min.js"></script>
+<script src="/signaturepad/js/signature_pad.js"></script>
+
+<script>
+    var signature = new SignaturePad("signature");
+    signature.fromDataURL('{{ image_data }}');
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "jsignature",
+  "version": "1.0.0",
+  "description": "Testing jSignature",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.3",
+    "swig": "^1.4.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

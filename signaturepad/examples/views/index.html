@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signature Pad Example</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <style>
+        .signature {
+            border: solid 1px #CCCCCC;
+            min-height: 160px;
+        }
+        .type span {
+            display: block;
+        }
+        .type textarea {
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Form that requires signature</h1>
+
+    <form action="/reception" method="post">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label" for="name">Nombre</label>
+                <input type="text" name="name" id="name" placeholder="Nombre" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="signature">Firma</label>
+                <div class="signature" id="signature"></div>
+                <input type="button" value="Limpiar" onclick="clearSignature()" class="btn btn-warning pull-right">
+            </div>
+
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary">Aceptar</button>
+            </div>
+
+        </div>
+        <div class="col-md-5 col-md-offset-1">
+            <h3>Sending the data</h3>
+            <div class="type">
+                <span>image data</span>
+                <textarea name="image_data" id="image_data" rows="3"></textarea>
+            </div>
+            <div class="type">
+                <span>image</span>
+                <img id="image" src="" alt="Signature">
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="/jquery/jquery-1.11.3.min.js"></script>
+<script src="/signaturepad/js/signature_pad.js"></script>
+
+<script>
+    var signature = new SignaturePad("signature", { onEnd: receive });
+
+    function receive(e){
+        $("#image_data").val(e.toDataURL());
+        $("#image").attr("src", e.toDataURL());
+    }
+
+    function clearSignature(){
+        signature.clear();
+    }
+</script>
+</body>
+</html>
