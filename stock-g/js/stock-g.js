@@ -530,18 +530,18 @@
                     },
                     lang: {
                         no_data: "No se ha proporcionado información por favor selecciona una fuente de datos para graficar",
-                        hint_pause: "Detiene la actualizacion",
+                        hint_pause: "Detiene la actualización cada nuevo tick",
                         hint_zoom: "Activa o desactiva la posibilidad de zoom",
-                        hint_supstance: "Dibujar substancia",
+                        hint_supstance: "Dibujar soporte y resistencia",
                         hint_trendline: "Dibujar tendencia",
                         hint_trade: "Dibujar flecha en tick",
                         hint_reset: "Devuelve la grafica a su posición inicial",
                         hint_clear: "Limpia todos los dibujos de analisis",
                         hint_macd: "Activa o desactiva la grafica MACD",
                         hint_rsi: "Activa o desactiva la grafica RSI",
-                        hint_sma0: "Muestra las medias moviles cortas",
-                        hint_sma1: "Muestra las medias moviles medias",
-                        hint_ema2: "Muestra las medias exponenciales moviles"
+                        hint_sma0: "Muestra las medias moviles (10D)",
+                        hint_sma1: "Muestra las medias moviles (20D)",
+                        hint_ema2: "Muestra las medias exponenciales moviles (50D)"
                     }
                 };
                 for (var key in options) {
